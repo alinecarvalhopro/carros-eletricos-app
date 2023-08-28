@@ -1,24 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp">
+    android:paddingRight="16dp"
+    android:paddingLeft="16dp" >
+
+    <EditText
+        android:id="@+id/nome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nome"/>
+
+    <EditText
+        android:id="@+id/sobrenome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/nome"
+        android:hint="Sobrenome" />
+
     <TextView
+        android:id="@id/cidade"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Formulário" />
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Enviar formulário"/>
+        android:text="Cidade: Praia Grande"
+        android:layout_below="@id/sobrenome" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/gosto_musical"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/cidade"
+        android:text="Gosto musical" />
+    <Button
+        android:id="@+id/btn_enviar"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/gosto_musical"
+        android:text="Enviar "/>
+</RelativeLayout>
