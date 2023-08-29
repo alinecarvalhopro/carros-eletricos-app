@@ -4,7 +4,9 @@
 
 App em Android Kotlin para calcular a autonomia de carros elétricos.
 
-Imagem atualizada em 28/08/2023, refletindo o estágio de desenvolvimento atual.
+Imagem atualizada em 29/08/2023, refletindo o estágio de desenvolvimento atual.
 
-![Captura de tela 2023-08-28 183635](https://github.com/alinecarvalhopro/carros-eletricos-app/assets/118927052/cb92cde2-dc64-4c4d-887d-e47ddd3a983b)
+![Captura de tela 2023-08-29 123953](https://github.com/alinecarvalhopro/carros-eletricos-app/assets/118927052/fb14f6a5-5655-4f2b-ac1e-7e1bf2950d4b)
+![Captura de tela 2023-08-29 123921](https://github.com/alinecarvalhopro/carros-eletricos-app/assets/118927052/11151bd7-7201-4497-af1e-e213643c955c)
+
 
