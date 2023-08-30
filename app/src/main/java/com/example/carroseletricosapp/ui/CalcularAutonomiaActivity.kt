@@ -1,6 +1,5 @@
-package com.example.carroseletricosapp.presentation
+package com.example.carroseletricosapp.ui
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
