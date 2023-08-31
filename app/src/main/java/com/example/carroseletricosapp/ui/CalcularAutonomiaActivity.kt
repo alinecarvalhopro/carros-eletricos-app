@@ -1,12 +1,18 @@
 package com.example.carroseletricosapp.ui
 
+import android.os.AsyncTask
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.carroseletricosapp.R
+import java.lang.Exception
+import java.net.HttpURLConnection
+import java.net.URL
+import java.nio.channels.AsynchronousByteChannel
 
 class CalcularAutonomiaActivity : AppCompatActivity() {
 
@@ -45,4 +51,5 @@ class CalcularAutonomiaActivity : AppCompatActivity() {
         val calculo = preco / km
         resultado.text = calculo.toString()
     }
+
 }
