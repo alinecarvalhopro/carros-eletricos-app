@@ -3,6 +3,7 @@ package com.example.carroseletricosapp.ui.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.carroseletricosapp.R
@@ -10,6 +11,8 @@ import com.example.carroseletricosapp.domain.Carro
 
 class CarroAdapter(private val carros: List<Carro>) :
     RecyclerView.Adapter<CarroAdapter.ViewHolder>() {
+
+    var itemCarroListner: (Carro) -> Unit = {}
 
     // Cria uma nova view
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -23,6 +26,23 @@ class CarroAdapter(private val carros: List<Carro>) :
         holder.bateria.text = carros[position].bateria
         holder.potencia.text = carros[position].potencia
         holder.recarga.text = carros[position].recarga
+        holder.favorito.setOnClickListener{
+            val carro = carros[position]
+            itemCarroListner(carro)
+            configurarCarroFavorito(carro, holder)
+        }
+    }
+
+    private fun configurarCarroFavorito(
+        carro: Carro,
+        holder: ViewHolder
+    ) {
+        carro.carrofavorito = !carro.carrofavorito
+        if (carro.carrofavorito) {
+            holder.favorito.setImageResource(R.drawable.star_full)
+        } else {
+            holder.favorito.setImageResource(R.drawable.star_empty)
+        }
     }
 
     // Pega a quantidade de carros da lista
@@ -33,6 +53,7 @@ class CarroAdapter(private val carros: List<Carro>) :
         val bateria: TextView
         val potencia: TextView
         val recarga: TextView
+        val favorito: ImageView
 
         init {
             view.apply {
@@ -40,6 +61,7 @@ class CarroAdapter(private val carros: List<Carro>) :
                 bateria = findViewById(R.id.tv_bateria_value)
                 potencia = findViewById(R.id.tv_potencia_value)
                 recarga = findViewById(R.id.tv_recarga_value)
+                favorito = findViewById(R.id.iv_favorito)
             }
 
         }

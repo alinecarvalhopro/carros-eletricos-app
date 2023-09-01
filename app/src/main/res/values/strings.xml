@@ -14,4 +14,5 @@
     <string name="logo_descricao">Logo</string>
     <string name="ops_sem_conexao_com_a_internet">Ops, sem conexao com a internet :(</string>
     <string name="response_error">Algo deu errado, por favor tente novamente mais tarde.</string>
+    <string name="calculo_salvo">Calculo salvo</string>
 </resources>

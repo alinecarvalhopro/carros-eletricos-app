@@ -1,5 +1,6 @@
 package com.example.carroseletricosapp.ui
 
+import android.content.Context
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
@@ -26,6 +27,12 @@ class CalcularAutonomiaActivity : AppCompatActivity() {
         setContentView(R.layout.activity_calcular_autonomia)
         configurarViews()
         configurarListeners()
+        configurarResultadoSalvo()
+    }
+
+    private fun configurarResultadoSalvo() {
+        val valorCalculado = buscarSharedPref()
+        resultado.text = valorCalculado.toString()
     }
 
     fun configurarViews() {
@@ -47,9 +54,23 @@ class CalcularAutonomiaActivity : AppCompatActivity() {
 
     fun calcular() {
         val preco = precokwh.text.toString().toFloat()
-        val km = kmPercorrido.text.toString() .toFloat()
+        val km = kmPercorrido.text.toString().toFloat()
         val calculo = preco / km
         resultado.text = calculo.toString()
+        salvarSharedPref(calculo)
+    }
+
+    fun salvarSharedPref(resultado : Float) {
+        val sharedPref = getPreferences(Context.MODE_PRIVATE) ?: return
+        with(sharedPref.edit()) {
+            putFloat(getString(R.string.calculo_salvo), resultado)
+            apply()
+        }
+    }
+
+    fun buscarSharedPref(): Float {
+        val sharedPref = getPreferences(Context.MODE_PRIVATE)
+        return sharedPref.getFloat(getString(R.string.calculo_salvo), 0.0f)
     }
 
 }
