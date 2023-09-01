@@ -114,9 +114,9 @@ class CarroFragment : Fragment() {
             listaCarros.isVisible = true
             adapter = carroAdapter
         }
-//        carroAdapter.itemCarroListner = {carro ->
-//            val bateria = carro.bateria
-//        }
+        carroAdapter.itemCarroListner = {carro ->
+            val bateria = carro.bateria
+        }
     }
 
     fun configurarListeners() {
