@@ -4,33 +4,28 @@ import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.example.carroseletricosapp.R
-import com.example.carroseletricosapp.data.FabricaDeCarros
+import com.example.carroseletricosapp.data.CarrosAPI
 import com.example.carroseletricosapp.domain.Carro
 import com.example.carroseletricosapp.ui.adapter.CarroAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import org.json.JSONArray
-import org.json.JSONObject
-import org.json.JSONTokener
-import java.io.BufferedReader
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.lang.Exception
-import java.net.HttpURLConnection
-import java.net.URL
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class CarroFragment : Fragment() {
 
@@ -39,8 +34,7 @@ class CarroFragment : Fragment() {
     lateinit var barraDeProgresso: ProgressBar
     lateinit var semInternetImagem: ImageView
     lateinit var semInternetText: TextView
-
-    var carrosArray: ArrayList<Carro> = ArrayList()
+    lateinit var carrosApi: CarrosAPI
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,24 +46,56 @@ class CarroFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        configurarRetrofit()
         configurarView(view)
         configurarListeners()
     }
 
     override fun onResume() {
         super.onResume()
-        if(verificarInternet(context)) {
-            chamarServico()
+        if (verificarInternet(context)) {
+            buscarTodosOsCarros()
         } else {
             emptyState()
         }
     }
 
+    fun configurarRetrofit() {
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://igorbag.github.io/cars-api/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        carrosApi = retrofit.create(CarrosAPI::class.java)
+    }
+
+    fun buscarTodosOsCarros() {
+        carrosApi.buscarTodosOsCarros().enqueue(object : Callback<List<Carro>> {
+            override fun onResponse(call: Call<List<Carro>>, response: Response<List<Carro>>) {
+                if (response.isSuccessful) {
+                    barraDeProgresso.isVisible = false
+                    semInternetImagem.isVisible = false
+                    semInternetText.isVisible = false
+                    response.body()?.let {
+                        configurarLista(it)
+                    }
+                } else {
+                    Toast.makeText(context, R.string.response_error, Toast.LENGTH_LONG).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<Carro>>, t: Throwable) {
+                Toast.makeText(context, R.string.response_error, Toast.LENGTH_LONG).show()
+            }
+
+        })
+    }
+
     fun emptyState() {
-        barraDeProgresso.visibility = View.GONE
-        listaCarros.visibility = View.GONE
-        semInternetImagem.visibility = View.VISIBLE
-        semInternetText.visibility = View.VISIBLE
+        barraDeProgresso.isVisible = false
+        listaCarros.isVisible = false
+        semInternetImagem.isVisible = true
+        semInternetText.isVisible = true
     }
 
     fun configurarView(view: View) {
@@ -82,10 +108,10 @@ class CarroFragment : Fragment() {
         }
     }
 
-    fun configurarLista() {
-        val carroAdapter = CarroAdapter(carrosArray)
+    fun configurarLista(lista: List<Carro>) {
+        val carroAdapter = CarroAdapter(lista)
         listaCarros.apply {
-            listaCarros.visibility = View.VISIBLE
+            listaCarros.isVisible = true
             adapter = carroAdapter
         }
     }
@@ -94,11 +120,6 @@ class CarroFragment : Fragment() {
         fabCalcular.setOnClickListener {
             startActivity(Intent(context, CalcularAutonomiaActivity::class.java))
         }
-    }
-
-    fun chamarServico() {
-        val urlBase = "https://igorbag.github.io/cars-api/cars.json"
-        MyTask().execute(urlBase)
     }
 
     fun verificarInternet(context: Context?): Boolean {
@@ -122,83 +143,4 @@ class CarroFragment : Fragment() {
         }
     }
 
-    inner class MyTask : AsyncTask<String, String, String>() {
-
-        override fun onPreExecute() {
-            super.onPreExecute()
-            Log.d("MyTask", "Iniciando...")
-            barraDeProgresso.visibility = View.VISIBLE
-        }
-
-        override fun doInBackground(vararg url: String?): String {
-            var urlConnection: HttpURLConnection? = null
-
-            try {
-                val urlBase = URL(url[0])
-                urlConnection = urlBase.openConnection() as HttpURLConnection
-                urlConnection.connectTimeout = 6000
-                urlConnection.readTimeout = 6000
-                urlConnection.setRequestProperty(
-                    "Accept",
-                    "application/json"
-                )
-
-                val responseCode = urlConnection.responseCode
-
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    var resposta = urlConnection.inputStream.bufferedReader().use { it.readText() }
-                    publishProgress(resposta)
-                } else {
-                    Log.e("Erro", "Serviço indisponível no momento...")
-                }
-
-            } catch (ex: Exception) {
-                Log.e("Erro", "Erro ao realizar processamento...")
-            } finally {
-                urlConnection?.disconnect()
-            }
-            return " "
-        }
-
-        override fun onProgressUpdate(vararg values: String?) {
-            try {
-                val jsonArray = JSONTokener(values[0]).nextValue() as JSONArray
-                for (i in 0 until jsonArray.length()) {
-                    val id = jsonArray.getJSONObject(i).getString("id")
-                    Log.d("ID ->", id)
-
-                    val preco = jsonArray.getJSONObject(i).getString("preco")
-                    Log.d("preco ->", preco)
-
-                    val bateria = jsonArray.getJSONObject(i).getString("bateria")
-                    Log.d("bateria ->", bateria)
-
-                    val potencia = jsonArray.getJSONObject(i).getString("potencia")
-                    Log.d("potencia ->", potencia)
-
-                    val recarga = jsonArray.getJSONObject(i).getString("recarga")
-                    Log.d("recarga ->", recarga)
-
-                    val urlPhoto = jsonArray.getJSONObject(i).getString("urlPhoto")
-                    Log.d("urlPhoto ->", urlPhoto)
-
-                    val modeloDeCarro = Carro(
-                        id = id.toInt(),
-                        preco = preco,
-                        bateria = bateria,
-                        potencia = potencia,
-                        recarga = recarga,
-                        urlPhoto = urlPhoto
-                    )
-                    carrosArray.add(modeloDeCarro)
-                }
-                barraDeProgresso.visibility = View.GONE
-                semInternetImagem.visibility = View.GONE
-                semInternetText.visibility = View.GONE
-                configurarLista()
-            } catch (ex: Exception) {
-                Log.e("Erro", ex.message.toString())
-            }
-        }
-    }
 }
